@@ -1,0 +1,8 @@
+region: eu-central-1
+image: ami-0ac05733838eabc06
+instance_type: t2.micro
+keypair: gorpoghosyan@ansible
+security_group: NAKIVO_Transporter
+subnet_id: subnet-a9feb4d4
+
+download_url: https://d96i82q710b04.cloudfront.net/res/product/NAKIVO_Backup_Replication_v9.0.0_Installer_TRIAL.sh

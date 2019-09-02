@@ -1,0 +1,81 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - aws_keys.yml
+    - aws_vars.yml
+  tasks:
+
+    - name: Create a security group
+      ec2_group:
+        name: "{{ security_group }}"
+        description: The NAKIVO Transporter security group
+        region: "{{ region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 9446
+            to_port: 9446
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+
+    - name: Create Instance
+      ec2:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        image: "{{ image }}"
+        wait: yes
+        instance_type: "{{ instance_type }}"
+        group:  "{{ security_group }}"
+        region: "{{ region }}"
+        keypair: "{{ keypair }}"
+        vpc_subnet_id: "{{ subnet_id }}"
+        assign_public_ip: true
+        instance_tags:
+           name: "NAKIVO Transporter"
+      register: ec2
+
+
+    - name: Wait for SSH come up
+      wait_for:
+        host: "{{ item.public_ip }}"
+        port: 22
+        state: started
+      with_items: "{{ ec2.instances }}"
+
+
+    - name: Add created instance to hosts
+      add_host:
+        name: "{{ item.public_ip }}"
+        groups: nakivo_transporter
+        public_ip: "{{ item.public_ip }}"
+      with_items: "{{ ec2.instances }}"
+
+
+
+- hosts: nakivo_transporter
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+  vars_files:
+    - aws_vars.yml
+  tasks:
+
+    - name: Download NAKIVO Transporter
+      get_url:
+        url: "{{ download_url }}"
+        dest: ./NAKIVO_BR_Installer_TRIAL.sh
+        mode: '0755'
+
+    - name: Install NAKIVO Transporter
+      command: ./NAKIVO_BR_Installer_TRIAL.sh --eula-accept -t
+
+    - debug:
+        msg: "NAKIVO Transporter public ip: {{ public_ip }}"
