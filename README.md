@@ -40,5 +40,5 @@ aws_secret_key: iMcMw4TB7cv9k+bdLqMGHKSTQIsZD43RVuSKFnUt
 5) Run playbook.
 
 ```
-ansible-playbook --ask-vault-pass playbook.yml --extra-vars "@instances.yml"
+ansible-playbook --ask-vault-pass playbook.yml
 ```
