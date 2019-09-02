@@ -42,3 +42,7 @@ aws_secret_key: iMcMw4TB7cv9k+bdLqMGHKSTQIsZD43RVuSKFnUt
 ```
 ansible-playbook --ask-vault-pass playbook.yml
 ```
+
+
+Finally you will see a new created transporter ip, put it as
+'Installed service' in NAKIVO.
