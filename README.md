@@ -1,4 +1,4 @@
-## Automatically creating instances in AWS for web applications end load balancers
+## Deploying NAKIVO  Transporter to AWS EC2
 
 *Ansible playbook should be ran from same VPC*
 
